@@ -1,4 +1,5 @@
 :root {
+  height: 100svh;
   display: grid;
   place-content: center;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
