@@ -10,4 +10,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #f8f4f2;
+  border: 0.125rem solid #0f1a18;
+  border-radius: 0.5rem;
+  transition: 150ms;
+}
+.button:hover {
+  cursor: pointer;
+  transform: scale(105%);
+}
+.winStateContainer {
+  font-size: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.resetBtn {
+  padding: 1rem 1.5rem;
+  font-size: 1.5rem;
+  background-color: #f8f4f2;
+  border: none;
+  border-radius: 0.5rem;
+  transition: 150ms;
+}
+.resetBtn:hover {
+  background-color: #0f1a18;
+  color: #f8f4f2;
+  cursor: pointer;
 }

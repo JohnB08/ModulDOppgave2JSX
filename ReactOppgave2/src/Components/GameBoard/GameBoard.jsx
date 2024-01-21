@@ -106,6 +106,7 @@ export const GameBoard = () => {
         <div className={Style.winStateContainer}>
           <p>Congratulations, player {winner} won!</p>
           <button
+            className={Style.resetBtn}
             onClick={() => {
               setGameBoard(resetGameState(newBoardState));
               setActivePlayer(1);

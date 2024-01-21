@@ -7,7 +7,7 @@ export const Dot = () => {
         cx={50}
         cy={50}
         r={40}
-        stroke="black"
+        stroke="#0f1a18"
         strokeWidth="3"
         fill="transparent"
       />
