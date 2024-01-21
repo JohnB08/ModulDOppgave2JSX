@@ -24,6 +24,12 @@ export const GameBoard = () => {
     return gameState;
   };
 
+  /**
+   * Looper gjennom gameState og ser om det er kommet tre på rad.
+   *
+   * @param {number[][]} gameState Et todimensjonelt array som representerer boardStatet. hvert tall kan ha en state mellom 0 (ikke valgt), 1 (Dot/spiller1) og 2(Cross/spiller2)
+   * @returns
+   */
   const checkWin = (gameState) => {
     for (let i = 0; i < gameState.length; i++) {
       for (let j = 0; j < gameState[i].length; j++) {
@@ -43,34 +49,69 @@ export const GameBoard = () => {
           gameState[i][j] === gameState[i + 2][j]
         )
           return gameState[i][j];
+        //Diagonalt venstre top, høyre bunn
+        if (
+          i + 2 < gameState.length &&
+          j + 2 < gameState.length &&
+          gameState[i][j] === gameState[i + 1][j + 1] &&
+          gameState[i][j] === gameState[i + 2][j + 2]
+        )
+          return gameState[i][j];
+        //Diagonalt høyre top venstre bunn.
+        if (
+          i + 2 < gameState.length &&
+          /* Her passer jeg på at jeg starter skjekken på j>3, sånn at jeg vet forige steg vil være når j=2, og siste steg når j=1.
+            så den skjekker høyre top først, før den looper bakover og ser etter midtverdi og venstre bunn.  */
+          j - 2 >= 0 &&
+          gameState[i][j] === gameState[i + 1][j - 1] &&
+          gameState[i][j] === gameState[i + 2][j - 2]
+        )
+          return gameState[i][j];
       }
     }
+    return 0;
+  };
+
+  const updateGame = (row, column) => {
+    updateBoardState(row, column, currentPlayer);
+    console.log(newBoardState);
+    setWinState(checkWin(newBoardState));
+    setActivePlayer(currentPlayer === 1 ? 2 : 1);
   };
 
   return (
     <div>
       {gameState.map((row, rowIndex) => (
         <div key={rowIndex} className={Style.rows}>
-          {row.map((column, columnIndex) => (
+          {row.map((squareStateValue, columnIndex) => (
             <button
               key={columnIndex}
               className={Style.button}
               onClick={() => {
-                updateBoardState(rowIndex, columnIndex, currentPlayer);
-                console.log(newBoardState);
-                setWinState(checkWin(newBoardState));
-                setActivePlayer(currentPlayer === 1 ? 2 : 1);
+                !winner ? updateGame(rowIndex, columnIndex) : winner;
               }}
             >
-              {column === 0 ? "" : column === 1 ? <Dot></Dot> : <Cross></Cross>}
+              {squareStateValue === 0 ? (
+                ""
+              ) : squareStateValue === 1 ? (
+                <Dot></Dot>
+              ) : (
+                <Cross></Cross>
+              )}
             </button>
           ))}
         </div>
       ))}
       {winner ? (
         <div className={Style.winStateContainer}>
-          <p>Congratulations, player {currentPlayer} won!</p>
-          <button onClick={() => setGameBoard(resetGameState(newBoardState))}>
+          <p>Congratulations, player {winner} won!</p>
+          <button
+            onClick={() => {
+              setGameBoard(resetGameState(newBoardState));
+              setActivePlayer(1);
+              setWinState(0);
+            }}
+          >
             Play again?
           </button>
         </div>
