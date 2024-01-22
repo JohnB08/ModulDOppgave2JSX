@@ -72,7 +72,6 @@ export const resetGameState = (gameState) => {
  * @returns winCount med oppdaterte verdier.
  */
 export const updateWinCount = (winCount, winner) => {
-  console.log(winner);
   winCount[winner] += 1;
   return winCount;
 };

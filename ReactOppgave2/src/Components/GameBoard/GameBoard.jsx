@@ -4,7 +4,7 @@ import {
   resetGameState,
   updateWinCount,
   drawCheck,
-} from "../../gameFunctions/gameState.mjs";
+} from "../../gameFunctions/gameFunctions.mjs";
 import { GameSquare } from "../GameSquare/GameSquare";
 import { WinStateAnnouncer } from "../WinStateAnnouncer/WinStateAnnouncer";
 import { WinTracker } from "../WinTracker/WinTracker";
@@ -46,6 +46,16 @@ export const GameBoard = () => {
   };
 
   /**
+   * Resetter gameState til 0, oppdaterer winCount hvis det var en vinner.
+   */
+  const resetGame = () => {
+    setGameBoard(resetGameState(newBoardState));
+    setWinCount(updateWinCount(winCount, winner));
+    setActivePlayer(1);
+    setWinState(0);
+  };
+
+  /**
    * samlingsfunksjon for å oppdatere alle states hver gang en brikke er valgt.
    * @param {*} row koordinat i rad til knappen som nettopp er oppdatert
    * @param {*} column koordinat i kolonnen til knappen som nettopp er oppdatert.
@@ -84,11 +94,7 @@ export const GameBoard = () => {
         <WinStateAnnouncer
           winner={winner}
           onClick={() => {
-            /* resetter gamestate til 0 verdi. */
-            setGameBoard(resetGameState(newBoardState));
-            setWinCount(updateWinCount(winCount, winner));
-            setActivePlayer(1);
-            setWinState(0);
+            resetGame();
           }}
         />
       ) : (
