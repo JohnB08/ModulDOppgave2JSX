@@ -7,7 +7,7 @@ export const gameState = [
  * Looper gjennom gameState og ser om det er kommet tre på rad.
  *
  * @param {number[][]} gameState Et todimensjonelt array som representerer boardStatet. hvert tall kan ha en state mellom 0 (ikke valgt), 1 (Dot/spiller1) og 2(Cross/spiller2)
- * @returns
+ * @returns 1 hvis den finner en win, 0 hvis ikke.
  */
 export const checkWin = (gameState) => {
   for (let i = 0; i < gameState.length; i++) {
@@ -65,12 +65,24 @@ export const resetGameState = (gameState) => {
   return gameState;
 };
 
+/**
+ * incrementer winCount[winner] med 1.
+ * @param {number[]} winCount
+ * @param {number} winner
+ * @returns winCount med oppdaterte verdier.
+ */
 export const updateWinCount = (winCount, winner) => {
   console.log(winner);
   winCount[winner] += 1;
   return winCount;
 };
 
+/**
+ * Tar in gamestate, flater det ut, og ser om det er en "draw",
+ * aka om det er en verdi i alle rutene. Returnerer 0 om det fremdeles er en ledig slot, returnerer 1 om alle er gjort.
+ * @param {number[][]} gameState
+ * @returns 0 eller 1
+ */
 export const drawCheck = (gameState) => {
   const flattenedGameState = gameState.flat();
   for (let i = 0; i < flattenedGameState.length; i++) {

@@ -5,8 +5,9 @@ import {
   updateWinCount,
   drawCheck,
 } from "../../gameFunctions/gameState.mjs";
-import { Cross } from "../Cross/Cross";
-import { Dot } from "../Dot/Dot";
+import { GameSquare } from "../GameSquare/GameSquare";
+import { WinStateAnnouncer } from "../WinStateAnnouncer/WinStateAnnouncer";
+import { WinTracker } from "../WinTracker/WinTracker";
 import Style from "./GameBoard.module.css";
 import { useState } from "react";
 
@@ -33,11 +34,22 @@ export const GameBoard = () => {
   const [winner, setWinState] = useState(0);
   const [winCount, setWinCount] = useState([0, 0, 0]);
 
+  /**
+   * oppdaterer en koordinat i 2d array med ny verdi
+   * @param {*} row hvilken rad
+   * @param {*} column hvilken kolonne
+   * @param {*} playerValue hva verdi skal settes
+   */
   const updateBoardState = (row, column, playerValue) => {
     newBoardState[row][column] = playerValue;
     setGameBoard(newBoardState);
   };
 
+  /**
+   * samlingsfunksjon for å oppdatere alle states hver gang en brikke er valgt.
+   * @param {*} row koordinat i rad til knappen som nettopp er oppdatert
+   * @param {*} column koordinat i kolonnen til knappen som nettopp er oppdatert.
+   */
   const updateGame = (row, column) => {
     updateBoardState(row, column, currentPlayer);
     console.log(newBoardState);
@@ -46,59 +58,39 @@ export const GameBoard = () => {
   };
 
   return (
-    <div>
-      <div className={Style.winTracker}>
-        <p>Player 1 has won {winCount[1]} times.</p>
-        <p>Player 2 has won {winCount[2]} times.</p>
-      </div>
+    <div className={Style.GameBoard}>
+      <WinTracker winCount={winCount} />
       {/* mapper først ut alle rows, tilsvarer gameState[i] */}
       {gameState.map((row, rowIndex) => (
         /* Mapper så alle columns, tilsvarer gameState[i][j] */
         <div key={rowIndex} className={Style.rows}>
           {row.map((squareStateValue, columnIndex) => (
-            /* Lager en knapp for hver value i 2d array. */
-            <button
+            /* Lager en GameSquare react komponent for hver value i 2d array. */
+            <GameSquare
               key={columnIndex}
-              className={Style.button}
+              SquareState={squareStateValue}
               onClick={() => {
                 /* Hvis ingen har vunnet, så fortsetter spillet, hvis ikke skjer ingenting. */
                 !winner && !squareStateValue
                   ? updateGame(rowIndex, columnIndex)
                   : winner;
               }}
-            >
-              {squareStateValue === 0 ? (
-                ""
-              ) : squareStateValue === 1 ? (
-                <Dot></Dot>
-              ) : (
-                <Cross></Cross>
-              )}
-            </button>
+            />
           ))}
         </div>
       ))}
-      {/* Denne div popper kun opp hvis noen har vunnet. hvis ikke forvinner den. */}
+      {/* Denne div popper kun opp hvis noen har vunnet, eller det finner en draw. hvis ikke er den skjult. */}
       {winner || drawCheck(newBoardState) ? (
-        <div className={Style.winStateContainer}>
-          {winner ? (
-            <p>Congratulations, player {winner} won!</p>
-          ) : (
-            <p>It is a draw!</p>
-          )}
-          <button
-            className={Style.resetBtn}
-            onClick={() => {
-              /* resetter gamestate til 0 verdi. */
-              setGameBoard(resetGameState(newBoardState));
-              setWinCount(updateWinCount(winCount, winner));
-              setActivePlayer(1);
-              setWinState(0);
-            }}
-          >
-            Play again?
-          </button>
-        </div>
+        <WinStateAnnouncer
+          winner={winner}
+          onClick={() => {
+            /* resetter gamestate til 0 verdi. */
+            setGameBoard(resetGameState(newBoardState));
+            setWinCount(updateWinCount(winCount, winner));
+            setActivePlayer(1);
+            setWinState(0);
+          }}
+        />
       ) : (
         ""
       )}
