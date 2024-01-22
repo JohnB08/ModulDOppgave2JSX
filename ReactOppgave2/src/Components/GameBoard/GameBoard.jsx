@@ -80,7 +80,8 @@ export const GameBoard = () => {
               key={columnIndex}
               SquareState={squareStateValue}
               onClick={() => {
-                /* Hvis ingen har vunnet, så fortsetter spillet, hvis ikke skjer ingenting. */
+                /* Hvis ingen har vunnet eller det fremdeles er en ledig plass på brettet, så oppdaterer den brettet,
+                hvis noen har vunnet eller "square" allerede er okkupert skjer ingenting. */
                 !winner && !squareStateValue
                   ? updateGame(rowIndex, columnIndex)
                   : winner;
@@ -89,7 +90,8 @@ export const GameBoard = () => {
           ))}
         </div>
       ))}
-      {/* Denne div popper kun opp hvis noen har vunnet, eller det finner en draw. hvis ikke er den skjult. */}
+      {/* Denne div popper kun opp hvis noen har vunnet, eller det finner en draw. hvis ikke er den skjult.
+      winner må stå først her, ellers kan et win med fullt brett bli draw.*/}
       {winner || drawCheck(newBoardState) ? (
         <WinStateAnnouncer
           winner={winner}

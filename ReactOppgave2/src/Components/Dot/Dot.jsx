@@ -1,5 +1,9 @@
 import Style from "./Dot.module.css";
 
+/**
+ *
+ * @returns svg, bilde av sirkel
+ */
 export const Dot = () => {
   return (
     <svg height="100" width="100" className={Style.Dot}>

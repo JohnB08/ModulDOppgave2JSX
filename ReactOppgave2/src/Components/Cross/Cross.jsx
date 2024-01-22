@@ -1,5 +1,10 @@
 import Style from "./Cross.module.css";
 
+
+/**
+ * 
+ * @returns svg fil, bilde av kryss.
+ */
 export const Cross = () => {
   return (
     <svg height="100" width="100" className={Style.Cross}>
