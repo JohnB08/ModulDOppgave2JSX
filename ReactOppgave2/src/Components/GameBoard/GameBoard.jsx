@@ -62,6 +62,7 @@ export const GameBoard = () => {
    */
   const updateGame = (row, column) => {
     updateBoardState(row, column, currentPlayer);
+    /* Skjekker boardState i konsoll, at det stemmer overens med det visuelle brettet. */
     console.log(newBoardState);
     setWinState(checkWin(newBoardState));
     setActivePlayer(currentPlayer === 1 ? 2 : 1);
