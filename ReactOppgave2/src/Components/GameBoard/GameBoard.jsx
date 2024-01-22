@@ -1,75 +1,41 @@
-import { gameState } from "../../gameFunctions/gameState.mjs";
+import {
+  gameState,
+  checkWin,
+  resetGameState,
+  updateWinCount,
+  drawCheck,
+} from "../../gameFunctions/gameState.mjs";
 import { Cross } from "../Cross/Cross";
 import { Dot } from "../Dot/Dot";
 import Style from "./GameBoard.module.css";
 import { useState } from "react";
 
 export const GameBoard = () => {
+  /* Hver "useState" tilsvarer en "state" en global variabel brukt av 
+  react componenten kan ha. Siden GameBoard componente må tracke tre ting: BoardState, currentPlater og om noen har vunnet,
+  må det settes opp useStates for disse, sånn at react vet componenten må reloades når disse variablene er "satt" på nytt.
+  
+  Eksempel:
+  const [newBoardState, setGameBoard] = useState(gameState)
+  
+  her destrukrurerer vi ut useStatefunksjonen, med den satte variabelen den skal oppdateres med. 
+  newBoardState er variabelnavnet komponenten bruker hver gang den refererer til en variabel med samme struktur som gameState.
+  setGameBoard er det funksjonen som oppdaterer "state" for variabelen heter.
+  
+  setGameBoard trengs ikke å bli deklarert, for det er det vi kaller den innebygde funksjonen som bli destrukturert ut fra useState. 
+  
+  funksjonene setGameBoard, setActivePlayer og setWinState er teknisk sett den samme funksjonen, bare destrukturert til forskjellige referanser,
+  så vi vet hvilken "State" som skal brukes til en hver tid. Dette lar oss bestemme når React oppdaterer componenten basert på når vi setter en ny "State"
+  til variabelen tilknyttet den destrukturerte funksjonen. setGameBoard(newBoardState) vil fortelle react at de nå skal
+  reloade alle elementer som bruker newBoardState på nytt.*/
   const [newBoardState, setGameBoard] = useState(gameState);
   const [currentPlayer, setActivePlayer] = useState(1);
   const [winner, setWinState] = useState(0);
+  const [winCount, setWinCount] = useState([0, 0, 0]);
 
   const updateBoardState = (row, column, playerValue) => {
-    const boardState = [...newBoardState];
-    boardState[row][column] = playerValue;
-    setGameBoard(boardState);
-  };
-
-  const resetGameState = (gameState) => {
-    for (let i = 0; i < gameState.length; i++) {
-      for (let j = 0; j < gameState[i].length; j++) {
-        gameState[i][j] = 0;
-      }
-    }
-    return gameState;
-  };
-
-  /**
-   * Looper gjennom gameState og ser om det er kommet tre på rad.
-   *
-   * @param {number[][]} gameState Et todimensjonelt array som representerer boardStatet. hvert tall kan ha en state mellom 0 (ikke valgt), 1 (Dot/spiller1) og 2(Cross/spiller2)
-   * @returns
-   */
-  const checkWin = (gameState) => {
-    for (let i = 0; i < gameState.length; i++) {
-      for (let j = 0; j < gameState[i].length; j++) {
-        //Blar først gjennom 2d array vertikalt i j akse.
-        if (gameState[i][j] !== 0) {
-          if (
-            j + 2 < gameState[i].length &&
-            gameState[i][j] === gameState[i][j + 1] &&
-            gameState[i][j] === gameState[i][j + 2]
-          )
-            return gameState[i][j];
-        }
-        //skjekker gjennom 2d array vertikal akse.
-        if (
-          i + 2 < gameState.length &&
-          gameState[i][j] === gameState[i + 1][j] &&
-          gameState[i][j] === gameState[i + 2][j]
-        )
-          return gameState[i][j];
-        //Diagonalt venstre top, høyre bunn
-        if (
-          i + 2 < gameState.length &&
-          j + 2 < gameState.length &&
-          gameState[i][j] === gameState[i + 1][j + 1] &&
-          gameState[i][j] === gameState[i + 2][j + 2]
-        )
-          return gameState[i][j];
-        //Diagonalt høyre top venstre bunn.
-        if (
-          i + 2 < gameState.length &&
-          /* Her passer jeg på at jeg starter skjekken på j>3, sånn at jeg vet forige steg vil være når j=2, og siste steg når j=1.
-            så den skjekker høyre top først, før den looper bakover og ser etter midtverdi og venstre bunn.  */
-          j - 2 >= 0 &&
-          gameState[i][j] === gameState[i + 1][j - 1] &&
-          gameState[i][j] === gameState[i + 2][j - 2]
-        )
-          return gameState[i][j];
-      }
-    }
-    return 0;
+    newBoardState[row][column] = playerValue;
+    setGameBoard(newBoardState);
   };
 
   const updateGame = (row, column) => {
@@ -81,14 +47,24 @@ export const GameBoard = () => {
 
   return (
     <div>
+      <div className={Style.winTracker}>
+        <p>Player 1 has won {winCount[1]} times.</p>
+        <p>Player 2 has won {winCount[2]} times.</p>
+      </div>
+      {/* mapper først ut alle rows, tilsvarer gameState[i] */}
       {gameState.map((row, rowIndex) => (
+        /* Mapper så alle columns, tilsvarer gameState[i][j] */
         <div key={rowIndex} className={Style.rows}>
           {row.map((squareStateValue, columnIndex) => (
+            /* Lager en knapp for hver value i 2d array. */
             <button
               key={columnIndex}
               className={Style.button}
               onClick={() => {
-                !winner ? updateGame(rowIndex, columnIndex) : winner;
+                /* Hvis ingen har vunnet, så fortsetter spillet, hvis ikke skjer ingenting. */
+                !winner && !squareStateValue
+                  ? updateGame(rowIndex, columnIndex)
+                  : winner;
               }}
             >
               {squareStateValue === 0 ? (
@@ -102,13 +78,20 @@ export const GameBoard = () => {
           ))}
         </div>
       ))}
-      {winner ? (
+      {/* Denne div popper kun opp hvis noen har vunnet. hvis ikke forvinner den. */}
+      {winner || drawCheck(newBoardState) ? (
         <div className={Style.winStateContainer}>
-          <p>Congratulations, player {winner} won!</p>
+          {winner ? (
+            <p>Congratulations, player {winner} won!</p>
+          ) : (
+            <p>It is a draw!</p>
+          )}
           <button
             className={Style.resetBtn}
             onClick={() => {
+              /* resetter gamestate til 0 verdi. */
               setGameBoard(resetGameState(newBoardState));
+              setWinCount(updateWinCount(winCount, winner));
               setActivePlayer(1);
               setWinState(0);
             }}
